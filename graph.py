@@ -76,8 +76,8 @@ if __name__ == '__main__':
             wikipedia_graph.add_node(node2)
             wikipedia_graph.add_edge(node1, node2)
 
-    # Testing
-    # TODO
+    # Results
+    
 
 
 

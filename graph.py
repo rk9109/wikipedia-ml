@@ -43,6 +43,7 @@ if __name__ == '__main__':
         print('Loading information from: ', names_file)
         for line in tqdm(infile, total=number_lines(names_file)):
             v, name = line.split(" ", 1)
+            name = name.rstrip()
             v = int(v)
             
             # Create node
@@ -61,8 +62,11 @@ if __name__ == '__main__':
             # Iterate through nodes in category
             for v in nodes:
                 v = int(v)
+
                 # Update category
-                node_dict[v] = category
+                node = node_dict[v]
+                node.category = category
+                node_dict[v] = node
 
     # Construct edges
     with open(edges_file) as infile:
@@ -77,7 +81,8 @@ if __name__ == '__main__':
             wikipedia_graph.add_node(node2)
             wikipedia_graph.add_edge(node1, node2)
 
-    # Testing
-    # TODO
+    # Results
+    
+
 
 

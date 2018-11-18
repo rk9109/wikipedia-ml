@@ -19,10 +19,15 @@ class Node:
 class Graph:
     def __init__(self):
         self.nodes = set()
+        self.num_nodes = 0
+        self.node_order = dict()
         self.edges = defaultdict(list)
     
     def add_node(self, value):
         self.nodes.add(value)
+        self.num_nodes = self.num_nodes + 1
+        self.node_order[value] = self.num_nodes -1
+
 
     def add_edge(self, node1, node2):
         self.edges[node1].append(node2)

@@ -1,1 +1,4 @@
-wikipedia-data/
+# Byte-compiled
+__pycache__/
+*.pyc
+

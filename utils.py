@@ -13,7 +13,7 @@ def encode_onehot(labels):
 
 
 def load_cora_data(path="cora_data/", dataset="cora"):
-    """Load citation network dataset (cora only for now)"""
+    """Load citation network dataset"""
     print('Loading {} dataset...'.format(dataset))
 
     idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset), dtype=np.dtype(str))
@@ -36,6 +36,29 @@ def load_cora_data(path="cora_data/", dataset="cora"):
 
     return features.todense(), adj, labels
 
+def load_web_data(path="web_data/", dataset="cornell"):
+    """Load citation network dataset"""
+    print('Loading {} dataset...'.format(dataset))
+
+    idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset), dtype=np.dtype(str))
+    features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
+    labels = encode_onehot(idx_features_labels[:, -1])
+
+    # build graph
+    idx = np.array(idx_features_labels[:, 0], dtype=np.dtype(str))
+    idx_map = {j: i for i, j in enumerate(idx)}
+    edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.dtype(str))
+    edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
+                     dtype=np.int32).reshape(edges_unordered.shape)
+    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
+                        shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+
+    # build symmetric adjacency matrix
+    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+
+    print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
+
+    return features.todense(), adj, labels
 
 def normalize_adj(adj, symmetric=True):
     if symmetric:
@@ -61,9 +84,9 @@ def sample_mask(idx, l):
 
 def get_splits(y):
     split_val = len(y) // 4
-    idx_train = range(split_val * 3)
-    idx_val = range(split_val * 3, split_val * 4)
-    idx_test = range(split_val * 3, split_val * 4)
+    idx_train = range(split_val * 4)
+    idx_val   = range(split_val * 2, split_val * 3)
+    idx_test  = range(split_val * 3, split_val * 4)
     y_train = np.zeros(y.shape, dtype=np.int32)
     y_val = np.zeros(y.shape, dtype=np.int32)
     y_test = np.zeros(y.shape, dtype=np.int32)

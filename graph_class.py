@@ -2,9 +2,9 @@ import sys
 from collections import defaultdict
 
 # Parameters
-directory_name  = 'email-data/'
-edges_file      = directory_name + 'email-core.txt'
-labels_file     = directory_name + 'email-labels.txt'
+directory_name  = 'email_data/'
+edges_file      = directory_name + 'email_core.txt'
+labels_file     = directory_name + 'email_labels.txt'
 
 # Graph class
 class Node:
@@ -35,7 +35,7 @@ def construct_graph():
     node_dict = {}
     with open(labels_file) as infile:
         print('Loading information from: ', labels_file)
-        for line in labels_file:
+        for line in infile:
             v, label = line.split()
 
             # Create node
@@ -47,7 +47,7 @@ def construct_graph():
     # Construct edges
     with open(edges_file) as infile:
         print('Loading information from: ', edges_file)
-        for line in edges_file:
+        for line in infile:
             v1, v2 = line.split()
             v1 = int(v1); v2 = int(v2)
 
@@ -56,11 +56,23 @@ def construct_graph():
             email_graph.add_node(node1)
             email_graph.add_node(node2)
             email_graph.add_edge(node1, node2)
+            email_graph.add_edge(node2, node1)
 
     return email_graph
 
-def k_nearest_neighbor(graph, k=10):
-    pass
+
+def nearest_neighbor(graph):
+    loss = 0
+    for node in graph.nodes:
+        neighbors = [neighbor.label for neighbor in graph.edges[node]]
+        pred      = max(set(neighbors), key=neighbors.count)
+        real      = node.label
+
+        if (real != pred):
+            loss = loss + 1
+
+    print('0-1 NN Error = ' + str(loss) + ', Mean 0-1 Error = ' + str(loss/len(email_graph.nodes)))
+
 
 if __name__ == '__main__':
     # Call constructor
@@ -70,3 +82,4 @@ if __name__ == '__main__':
     print("Dataset has {} nodes".format(len(email_graph.nodes)))
 
     # TODO Implement k-NN here
+    nearest_neighbor(email_graph)

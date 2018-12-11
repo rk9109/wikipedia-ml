@@ -18,11 +18,12 @@ FILTER = 'localpool'  # 'chebyshev'
 MAX_DEGREE = 2  # maximum polynomial degree
 SYM_NORM = True  # symmetric (True) vs. left-only (False) normalization
 NB_EPOCH = 200
-PATIENCE = 500  # early stopping patience
+PATIENCE = 100  # early stopping patience
 
 # Get data
-X, A, y = load_cora_data(dataset='cora')
-# X, A, y = load_email_data(dataset='email')
+# X, A, y = load_cora_data(dataset='cora')
+X, A, y = load_web_data(dataset='cornell')
+
 
 y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y)
 
@@ -57,15 +58,9 @@ X_in = Input(shape=(X.shape[1],))
 # NOTE: We pass arguments for graph convolutional layers as a list of tensors.
 # This is somewhat hacky, more elegant options would require rewriting the Layer base class.
 H = Dropout(0.1)(X_in)
-H = GraphConvolution(16, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
+H = GraphConvolution(16, support, activation='relu', kernel_regularizer=l2(5e-6))([H]+G)
 H = Dropout(0.1)(H)
 Y = GraphConvolution(y.shape[1], support, activation='softmax')([H]+G)
-# H = X_in
-# H = GraphConvolution(64, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
-# H = GraphConvolution(32, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
-# H = Dense(8, activation='relu')(H)
-# H = Dense(32, activation='relu')(H)
-# Y = Dense(y.shape[1], activation='softmax')(H)
 
 
 # Compile model

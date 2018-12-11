@@ -1,11 +1,6 @@
 import sys
 from collections import defaultdict
 
-# Parameters
-directory_name  = 'email_data/'
-edges_file      = directory_name + 'email_core.txt'
-labels_file     = directory_name + 'email_labels.txt'
-
 # Graph class
 class Node:
     def __init__(self, value, label):
@@ -24,41 +19,47 @@ class Graph:
         self.edges[node1].append(node2)
 
 
-def construct_graph():
+def construct_graph(university):
     """
-    Return: email_graph | graph from emails-data
+    Return: web_graph | graph from web_data
     """
     # Initialize graph
-    email_graph = Graph()
+    web_graph = Graph()
+
+    # Parameters
+    directory_name  = 'web_data/'
+    edges_file      = directory_name + university + '.cites'
+    labels_file     = directory_name + university + '.content'
 
     # Construct nodes
     node_dict = {}
     with open(labels_file) as infile:
         print('Loading information from: ', labels_file)
         for line in infile:
-            v, label = line.split()
+            values = line.split()
+            name  = values[0]
+            label = values[-1]
 
             # Create node
-            node = Node(int(v), int(label))
+            node = Node(name, label)
 
             # Add node to dictionary
-            node_dict[int(v)] = node
+            node_dict[name] = node
 
     # Construct edges
     with open(edges_file) as infile:
         print('Loading information from: ', edges_file)
         for line in infile:
             v1, v2 = line.split()
-            v1 = int(v1); v2 = int(v2)
 
             node1 = node_dict[v1]
             node2 = node_dict[v2]
-            email_graph.add_node(node1)
-            email_graph.add_node(node2)
-            email_graph.add_edge(node1, node2)
-            email_graph.add_edge(node2, node1)
+            web_graph.add_node(node1)
+            web_graph.add_node(node2)
+            web_graph.add_edge(node1, node2)
+            web_graph.add_edge(node2, node1)
 
-    return email_graph
+    return web_graph
 
 
 def nearest_neighbor(graph):
@@ -71,15 +72,15 @@ def nearest_neighbor(graph):
         if (real != pred):
             loss = loss + 1
 
-    print('0-1 NN Error = ' + str(loss) + ', Mean 0-1 Error = ' + str(loss/len(email_graph.nodes)))
+    print('0-1 NN Error = ' + str(loss) + ', Mean 0-1 Error = ' + str(loss/len(web_graph.nodes)))
 
 
 if __name__ == '__main__':
     # Call constructor
-    email_graph = construct_graph()
+    web_graph = construct_graph('washington')
 
     # Results
-    print("Dataset has {} nodes".format(len(email_graph.nodes)))
+    print("Dataset has {} nodes".format(len(web_graph.nodes)))
 
-    # TODO Implement k-NN here
-    nearest_neighbor(email_graph)
+    # Nearest neighbor
+    nearest_neighbor(web_graph)

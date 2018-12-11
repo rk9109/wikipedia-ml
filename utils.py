@@ -36,6 +36,7 @@ def load_cora_data(path="cora_data/", dataset="cora"):
 
     return features.todense(), adj, labels
 
+
 def load_web_data(path="web_data/", dataset="cornell"):
     """Load citation network dataset"""
     print('Loading {} dataset...'.format(dataset))
@@ -59,6 +60,7 @@ def load_web_data(path="web_data/", dataset="cornell"):
     print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
 
     return features.todense(), adj, labels
+
 
 def normalize_adj(adj, symmetric=True):
     if symmetric:
